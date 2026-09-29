@@ -1,0 +1,25 @@
+# Build outputs
+bin/
+obj/
+dist/
+node_modules/
+
+# Secrets / environment
+.env
+.env.local
+.env.*.local
+
+# IDE / user files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Test artifacts
+TestResults/
+*.trx
+
+# OS files
+Thumbs.db
+.DS_Store

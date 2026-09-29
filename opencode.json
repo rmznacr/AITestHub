@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "evren/glm-5.3",
+  "provider": {
+    "evren": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "EVREN",
+      "options": {
+        "baseURL": "http://127.0.0.1:8787/v1",
+        "apiKey": "local-proxy"
+      },
+      "models": {
+        "glm-5.3": {
+          "name": "GLM 5.3"
+        }
+      }
+    }
+  }
+}

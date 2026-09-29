@@ -1,0 +1,61 @@
+name: aitesthub
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aitesthub}
+      POSTGRES_USER: ${POSTGRES_USER:-aitesthub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-aitesthub};Username=${POSTGRES_USER:-aitesthub};Password=${POSTGRES_PASSWORD}"
+      Evren__ApiKey: ${EVREN_API_KEY:-}
+      # The browser origin of the frontend container as exposed on the host.
+      Cors__AllowedOrigins: http://localhost:${FRONTEND_PORT:-5173}
+      # Apply pending EF Core migrations at startup (safe, additive only -
+      # never drops or recreates the database). The backend waits until
+      # PostgreSQL is healthy before migrating.
+      ApplyMigrationsAtStartup: "true"
+    ports:
+      - "${BACKEND_PORT:-5098}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./AITestHub.Web
+      dockerfile: Dockerfile
+      args:
+        # Public backend URL as seen from the browser (host port mapping).
+        VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-5098}
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres-data:

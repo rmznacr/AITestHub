@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AITestHub.csproj" />
+  <Project Path="AITestHub.Tests/AITestHub.Tests.csproj" />
+</Solution>

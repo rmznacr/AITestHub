@@ -1,0 +1,42 @@
+@AITestHub_HostAddress = http://localhost:5098
+
+### Health check
+GET {{AITestHub_HostAddress}}/health
+Accept: application/json
+
+### List projects
+GET {{AITestHub_HostAddress}}/api/projects
+Accept: application/json
+
+### Create a project
+POST {{AITestHub_HostAddress}}/api/projects
+Content-Type: application/json
+
+{
+  "name": "Demo Project",
+  "description": "Public API demo"
+}
+
+### Generate executable AI test cases (NOT persisted; review then call /save-api)
+POST {{AITestHub_HostAddress}}/api/aitestcases/generate-api
+Content-Type: application/json
+
+{
+  "projectId": 1,
+  "baseUrl": "https://jsonplaceholder.typicode.com",
+  "endpoint": "/posts",
+  "httpMethod": "POST",
+  "requirement": "Creating a post with a valid title and body returns 201 with the created post. Missing title returns 400.",
+  "count": 5
+}
+
+### Execute a saved test case
+POST {{AITestHub_HostAddress}}/api/testcases/1/execute
+
+### Execution history of a test case
+GET {{AITestHub_HostAddress}}/api/testcases/1/executions
+Accept: application/json
+
+### Global dashboard summary
+GET {{AITestHub_HostAddress}}/api/dashboard/summary
+Accept: application/json

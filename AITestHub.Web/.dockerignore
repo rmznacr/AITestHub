@@ -1,0 +1,9 @@
+# Frontend image build context exclusions.
+node_modules/
+dist/
+.env
+.env.*
+.git/
+.vs/
+.idea/
+*.user
